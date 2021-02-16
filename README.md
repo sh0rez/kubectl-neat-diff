@@ -20,7 +20,7 @@ $ cd kubectl-neat-diff
 $ make install
 ```
 
-[Arch Linux](https://archlinux.org) users can also use the [AUR package](https://aur.archlinux.org/kubectl-neat-diff).
+[Arch Linux](https://archlinux.org) users can also use the [AUR package](https://aur.archlinux.org/packages/kubectl-neat-diff).
 
 ### Usage
 
