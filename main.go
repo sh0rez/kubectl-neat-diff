@@ -34,8 +34,18 @@ func main() {
 		return c.Run()
 	}
 
-	if err := cmd.Execute(); err != nil {
-		log.Fatalln("Error:", err)
+	err := cmd.Execute()
+
+	// diff command always return exit 1, when diff is succeeded
+	if err != nil {
+		switch err.(type) {
+		case *exec.ExitError:
+			// this is just an exit code error, no worries
+			// do nothing
+
+		default: //couldn't run diff
+			log.Fatalln("Error:", err)
+		}
 	}
 }
 
