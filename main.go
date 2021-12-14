@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/go-clix/cli"
 	neat "github.com/zzehring/kubectl-neat/v2/cmd"
@@ -20,11 +22,14 @@ func main() {
 		Args:  cli.ArgsExact(2),
 	}
 
+	removeLinesRegEx := cmd.Flags().StringP("remove-matching-lines", "R", "",
+		"Remove lines matching RegEx from 'kubectl get' outputs prior to diff.")
+
 	cmd.Run = func(cmd *cli.Command, args []string) error {
-		if err := neatifyDir(args[0]); err != nil {
+		if err := neatifyDir(args[0], *removeLinesRegEx); err != nil {
 			return err
 		}
-		if err := neatifyDir(args[1]); err != nil {
+		if err := neatifyDir(args[1], *removeLinesRegEx); err != nil {
 			return err
 		}
 
@@ -39,7 +44,7 @@ func main() {
 	}
 }
 
-func neatifyDir(dir string) error {
+func neatifyDir(dir, removeLinesRe string) error {
 	fis, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return err
@@ -57,10 +62,28 @@ func neatifyDir(dir string) error {
 			return err
 		}
 
+		if removeLinesRe != "" {
+			regExp, err := regexp.Compile(removeLinesRe)
+			if err != nil {
+				return err
+			}
+			n = []byte(removeMatchingLines(string(n), regExp))
+		}
 		if err := ioutil.WriteFile(filename, []byte(n), fi.Mode()); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func removeMatchingLines(source string, re *regexp.Regexp) string {
+	lines := strings.Split(source, "\n")
+	var nonMatchingLines []string
+	for _, line := range lines {
+		if !re.MatchString(line) {
+			nonMatchingLines = append(nonMatchingLines, line)
+		}
+	}
+	return strings.Join(nonMatchingLines, "\n")
 }
