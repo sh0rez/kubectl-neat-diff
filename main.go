@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/go-clix/cli"
-	neat "github.com/itaysk/kubectl-neat/cmd"
+	neat "github.com/zzehring/kubectl-neat/v2/cmd"
 )
 
 func main() {
@@ -52,7 +52,7 @@ func neatifyDir(dir string) error {
 			return err
 		}
 
-		n, err := neat.NeatYAMLOrJSON(data)
+		n, err := neat.NeatYAMLOrJSON(data, "same")
 		if err != nil {
 			return err
 		}
