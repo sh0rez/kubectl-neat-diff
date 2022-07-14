@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
@@ -73,7 +72,7 @@ func neatifyDir(dir string) error {
 	return nil
 }
 
-func neatifyFile(filename string, mode fs.FileMode) error {
+func neatifyFile(filename string, mode os.FileMode) error {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return err
