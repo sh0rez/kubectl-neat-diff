@@ -22,10 +22,10 @@ func main() {
 	}
 
 	cmd.Run = func(cmd *cli.Command, args []string) error {
-		if err := neatify(args[0]); err != nil {
+		if err := statAndNeatifyPath(args[0]); err != nil {
 			return err
 		}
-		if err := neatify(args[1]); err != nil {
+		if err := statAndNeatifyPath(args[1]); err != nil {
 			return err
 		}
 
@@ -40,19 +40,25 @@ func main() {
 	}
 }
 
-func neatify(path string) error {
+func statAndNeatifyPath(path string) error {
 	// Stat evaluates symlinks so they are supported (if they lead to dirs or regular files).
 	fi, err := os.Stat(path)
 	if err != nil {
 		return err
 	}
-	if fi.Mode().IsDir() {
+	return neatify(path, fi.Mode())
+}
+
+// neatify calls the appropriate function for the file based on FileMode
+// neatify does not call Stat() because neatifyDir() aleady has FileInfo for the passed file
+func neatify(path string, fm os.FileMode) error {
+	if fm.IsDir() {
 		return neatifyDir(path)
 	}
-	if fi.Mode().IsRegular() {
-		return neatifyFile(path, fi.Mode())
+	if fm.IsRegular() {
+		return neatifyFile(path, fm)
 	}
-	return fmt.Errorf("Passed file '%s' is neither directory nor a regular file. "+
+	return fmt.Errorf("Found file '%s' which is neither directory nor a regular file. "+
 		"Special files like named pipes or device files are not supported.", path)
 }
 
@@ -64,7 +70,7 @@ func neatifyDir(dir string) error {
 
 	for _, fi := range fis {
 		filename := filepath.Join(dir, fi.Name())
-		if err = neatifyFile(filename, fi.Mode()); err != nil {
+		if err = neatify(filename, fi.Mode()); err != nil {
 			return err
 		}
 	}
@@ -72,7 +78,7 @@ func neatifyDir(dir string) error {
 	return nil
 }
 
-func neatifyFile(filename string, mode os.FileMode) error {
+func neatifyFile(filename string, fm os.FileMode) error {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return err
@@ -83,7 +89,7 @@ func neatifyFile(filename string, mode os.FileMode) error {
 		return err
 	}
 
-	if err := ioutil.WriteFile(filename, []byte(n), mode); err != nil {
+	if err := ioutil.WriteFile(filename, []byte(n), fm); err != nil {
 		return err
 	}
 	return nil
