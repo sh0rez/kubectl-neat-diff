@@ -19,6 +19,7 @@ func main() {
 		Short: "Remove fields from kubectl diff that carry low / no information",
 		Args:  cli.ArgsExact(2),
 	}
+	diff := cmd.Flags().String("diff", "diff", "diff command to use")
 
 	cmd.Run = func(cmd *cli.Command, args []string) error {
 		if err := neatifyDir(args[0]); err != nil {
@@ -28,7 +29,7 @@ func main() {
 			return err
 		}
 
-		c := exec.Command("diff", "-uN", args[0], args[1])
+		c := exec.Command(*diff, "-uN", args[0], args[1])
 		c.Stdout = os.Stdout
 		c.Stderr = os.Stderr
 		return c.Run()

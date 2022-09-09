@@ -10,6 +10,7 @@ install:
 	CGO_ENABLED=0 go install -ldflags=${LDFLAGS} .
 
 $(GOX):
-	go get -u github.com/mitchellh/gox
+	go install github.com/mitchellh/gox@latest
+
 cross: $(GOX)
 	CGO_ENABLED=0 gox -output="dist/{{.Dir}}-{{.OS}}-{{.Arch}}" -ldflags=${LDFLAGS} -osarch="linux/amd64" -osarch="darwin/amd64" -osarch="windows/amd64" .
