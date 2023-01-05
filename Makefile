@@ -12,4 +12,9 @@ install:
 $(GOX):
 	go get -u github.com/mitchellh/gox
 cross: $(GOX)
-	CGO_ENABLED=0 gox -output="dist/{{.Dir}}-{{.OS}}-{{.Arch}}" -ldflags=${LDFLAGS} -osarch="linux/amd64" -osarch="darwin/amd64" -osarch="windows/amd64" .
+	CGO_ENABLED=0 gox \
+		-output="dist/{{.Dir}}-{{.OS}}-{{.Arch}}"\
+		-ldflags=${LDFLAGS} \
+		-os="linux darwin" \
+		-arch="amd64 arm64" \
+		-osarch="windows/amd64" .

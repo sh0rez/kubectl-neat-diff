@@ -61,7 +61,7 @@ func neatifyDir(dir string) error {
 			return err
 		}
 
-		n, err := neat.NeatYAMLOrJSON(data)
+		n, err := neat.NeatYAMLOrJSON(data, "same")
 		if err != nil {
 			return err
 		}
