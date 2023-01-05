@@ -34,7 +34,16 @@ func main() {
 		return c.Run()
 	}
 
-	if err := cmd.Execute(); err != nil {
+	err := cmd.Execute()
+	if err != nil {
+		switch e := err.(type) {
+		case *exec.ExitError:
+			// exit status 1 means there is a diff, so we ignore this
+			if e.ExitCode() == 1 {
+				return
+			}
+		}
+		// otherwise log all errors
 		log.Fatalln("Error:", err)
 	}
 }
